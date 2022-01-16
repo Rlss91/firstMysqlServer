@@ -2,12 +2,14 @@ const createError = require("http-errors");
 const express = require("express");
 const path = require("path");
 const cookieParser = require("cookie-parser");
+const sessions = require("express-session");
 const logger = require("morgan");
 
 const usersModel = require("./model/users");
 
 const indexRouter = require("./routes/index");
 const usersRouter = require("./routes/users");
+const signupRouter = require("./routes/signup");
 
 const app = express();
 
@@ -19,6 +21,14 @@ app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+app.use(
+  sessions({
+    secret: "this is mysecret keyword",
+    saveUninitialized: true,
+    cookie: { maxAge: 1000 * 60 * 60 * 24 * 7 },
+    resave: false,
+  })
+);
 app.use(express.static(path.join(__dirname, "public")));
 
 app.use(
@@ -36,6 +46,7 @@ app.use(
 
 app.use("/", indexRouter);
 app.use("/users", usersRouter);
+app.use("/signup", signupRouter);
 
 app.post("/login", async (req, res) => {
   try {
