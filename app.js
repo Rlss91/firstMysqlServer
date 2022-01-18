@@ -10,6 +10,7 @@ const usersModel = require("./model/users");
 const indexRouter = require("./routes/index");
 const usersRouter = require("./routes/users");
 const signupRouter = require("./routes/signup");
+const categoriesRouter = require("./routes/categories");
 
 const app = express();
 
@@ -45,7 +46,18 @@ app.use(
 );
 
 app.use("/", indexRouter);
-app.use("/users", usersRouter);
+app.use(
+  "/users",
+  (req, res, next) => {
+    req.randomNumber = 5345357;
+    if (req.randomNumber % 2 == 0) {
+      next();
+    } else {
+      res.redirect("/");
+    }
+  },
+  usersRouter
+);
 app.use("/signup", signupRouter);
 
 app.post("/login", async (req, res) => {
@@ -56,6 +68,8 @@ app.post("/login", async (req, res) => {
     console.error(err);
   }
 });
+
+app.use("/categories", categoriesRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
